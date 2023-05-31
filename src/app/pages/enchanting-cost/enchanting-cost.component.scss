@@ -128,3 +128,26 @@
     }
     
   }
+
+
+  .buttons-container {
+    position: absolute;
+    top: 10%;
+    right: 10px;
+  }
+  
+  .save-button,
+  .share-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 35px;
+    height: 35px;
+  }
+  
+  .save-button i,
+  .share-button i {
+    margin-right: 5px;
+  }

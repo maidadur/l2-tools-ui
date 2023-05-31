@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+
 import { EnchantCostCalculator } from 'src/app/servives/enchant-cost-calculator.service';
+import { NotificationService } from 'src/app/servives/notification.service';
 import { EnchantingType } from 'src/app/types/enchanting-cost/enchanting.type';
 import { Unit } from 'src/app/types/enchanting-cost/unit.type';
 
@@ -16,16 +19,30 @@ export class EnchantingCostComponent {
 	maxEnchant = 18;
 	public unit = 2;
 	public unitCaption = 'Million';
+	savedUrls: { name: string; url: string }[] = [];
+	showSavedUrls: boolean = false;
 
-	constructor(private _calculator: EnchantCostCalculator) {
+	constructor(
+		private _calculator: EnchantCostCalculator,
+		private _notificationService: NotificationService,
+		private route: ActivatedRoute
+	) {
 		this.enchantType = EnchantingType.Physical;
 	}
 
 	public ngOnInit() {
-		this.prices = Array.from({ length: 18 }, (_, index) => 0);
+		this.route.queryParams.subscribe((params) => {
+			this.itemPriceValue = +params['i'] || 0;
+			this.enchantScrollPriceValue = +params['s'] || 0;
+			this.enchantType = params['t'] || this.enchantType;
+			this.recalculatePrices();
+		});
+		this.loadSavedUrls();
 	}
 
-	// Rest of your component logic
+	private _generateUrl() {
+		return `${window.location.origin}${window.location.pathname}?t=${this.enchantType}&i=${this.itemPriceValue}&s=${this.enchantScrollPriceValue}`;
+	}
 
 	public toggleCheckbox(checkboxNumber: EnchantingType) {
 		this.enchantType = checkboxNumber;
@@ -63,5 +80,35 @@ export class EnchantingCostComponent {
 			return Math.round(value * 100) / 100;
 		});
 		this.prices = values;
+	}
+
+	public onSaveClick() {
+		const name = prompt('Enter a name for the saved URL:');
+		if (name) {
+			const url = this._generateUrl();
+			const savedUrl = { name, url };
+			this.savedUrls.push(savedUrl);
+			this.saveUrlsToLocalStorage();
+			this.showSavedUrls = true;
+		}
+	}
+
+	loadSavedUrls() {
+		const savedUrlsString = localStorage.getItem('savedUrls');
+		if (savedUrlsString) {
+			this.savedUrls = JSON.parse(savedUrlsString);
+			this.showSavedUrls = true;
+		}
+	}
+
+	saveUrlsToLocalStorage() {
+		localStorage.setItem('savedUrls', JSON.stringify(this.savedUrls));
+	}
+
+	public onShareClick() {
+		const url = this._generateUrl();
+		navigator.clipboard.writeText(url).then(() => {
+			this._notificationService.showSuccess('URL copied to clipboard');
+		});
 	}
 }
