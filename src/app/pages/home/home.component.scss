@@ -1,3 +1,6 @@
+$primary-color: #079ad9;
+
+
 .center-container {
     display: flex;
     flex-direction: column;
@@ -22,4 +25,18 @@
     width: 200px;
     height: 200px;
     font-size: 18px;
+
+    background-color: $primary-color;
+    border-radius: 5px;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    img {
+      border-radius: 5px;
+    }
+
+    label {
+      margin: 15px 3px;
+    }
   }
