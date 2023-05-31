@@ -1,0 +1,89 @@
+<div class="section-container">
+    <h2>Enchanting Cost</h2>
+    <div class="container">
+        <div class="radio-tile-group">
+          <div class="input-container">
+            <input id="physical-weapon" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="phys" (ngModelChange)="typeChanged($event)">
+            <div class="radio-tile">
+              <div class="icon">
+                <img src="../../assets/phys_weapon.png" alt="Physical Weapon">
+              </div>
+              <label for="physical-weapon" class="radio-tile-label">Physical weapon</label>
+            </div>
+          </div>
+      
+          <div class="input-container">
+            <input id="magic-weapon" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="mag" (ngModelChange)="typeChanged($event)">
+            <div class="radio-tile">
+              <div class="icon">
+                <img src="../../assets/magic_weapon.png" alt="Magic Weapon">
+              </div>
+              <label for="magic-weapon" class="radio-tile-label">Magic weapon</label>
+            </div>
+          </div>
+      
+          <div class="input-container">
+            <input id="armor" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="armor" (ngModelChange)="typeChanged($event)">
+            <div class="radio-tile">
+              <div class="icon">
+                <img src="../../assets/armor.png" alt="Armor/Jewel pieces">
+              </div>
+              <label for="armor" class="radio-tile-label">Armor/Jewel pieces</label>
+            </div>
+          </div>
+      
+          <div class="input-container">
+            <input id="full-body" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="full-body" (ngModelChange)="typeChanged($event)">
+            <div class="radio-tile">
+              <div class="icon">
+                <img src="../../assets/full_body.png" alt="Full body">
+              </div>
+              <label for="full-body" class="radio-tile-label">Full body</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    <div class="text-container">
+        <div class="input-container">
+            <label>Item Price</label>
+            <div>
+              <input  type="number" [(ngModel)]="itemPriceValue" placeholder="Enter item price" min="0" (input)="recalculatePrices()">
+            </div>
+        </div>
+        <div class="input-container">
+            <label>Enchant Scroll Price</label>
+            <div>
+              <input  type="number" [(ngModel)]="enchantScrollPriceValue" placeholder="Enter enchant scroll price" min="0" (input)="recalculatePrices()">
+            </div>
+        </div>
+        <div class="input-container">
+          <div class="slider-label-container">
+            <label id="slider-name-label" >Units: </label>
+            <label class="slider-value-label">{{unitCaption}}</label>
+          </div>
+          <mat-slider
+              max="2"
+              min="0"
+              [step]="1">
+            <input matSliderThumb [(ngModel)]="unit" (input)="onSliderChanged()">
+          </mat-slider>
+        </div>
+      </div>
+  </div>
+  <div class="table-container">
+  <table class="price-table">
+    <thead>
+      <tr>
+        <th>Enchant Level</th>
+        <th>Price ({{unitCaption}})</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let price of prices; let i = index">
+        <td>+{{ i + 1 }}</td>
+        <td>{{ price | number }}</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
