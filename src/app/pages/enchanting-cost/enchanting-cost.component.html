@@ -92,11 +92,25 @@
     <div class="buttons-container">
       <div>
         <button class="save-button" (click)="onSaveClick()" title="Save">
-          <i class="fa fa-spin"></i>
+          <i class="fa fa-save"></i>
         </button>
         <button class="share-button" (click)="onShareClick()" title="Share">
           <i class="fa fa-share"></i>
         </button>
+      </div>
+
+      <div class="saved-urls" *ngIf="showSavedUrls">
+        <div class="saved-url" *ngFor="let savedUrl of savedUrls">
+          <button class="delete-saved-url-button" (click)="onSavedUrlDelete(savedUrl.id)">
+            <i class="fa fa-close"></i>
+          </button>
+          <a [href]="savedUrl.url" [title]="savedUrl.name">
+            <button class="saved-url-button">
+              <img src="../../assets/phys_weapon.png">
+              <label>{{savedUrl.name}}</label>
+            </button>
+          </a>
+        </div>
       </div>
     </div>
 

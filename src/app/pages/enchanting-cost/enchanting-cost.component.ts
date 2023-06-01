@@ -19,7 +19,7 @@ export class EnchantingCostComponent {
 	maxEnchant = 18;
 	public unit = 2;
 	public unitCaption = 'Million';
-	savedUrls: { name: string; url: string }[] = [];
+	savedUrls: { name: string; url: string; type: EnchantingType; id: number }[] = [];
 	showSavedUrls: boolean = false;
 
 	constructor(
@@ -86,11 +86,16 @@ export class EnchantingCostComponent {
 		const name = prompt('Enter a name for the saved URL:');
 		if (name) {
 			const url = this._generateUrl();
-			const savedUrl = { name, url };
+			const savedUrl = { name, url, type: this.enchantType, id: this.savedUrls.length + 1 };
 			this.savedUrls.push(savedUrl);
 			this.saveUrlsToLocalStorage();
 			this.showSavedUrls = true;
 		}
+	}
+
+	public onSavedUrlDelete(id: number) {
+		this.savedUrls = this.savedUrls.filter((v) => v.id !== id);
+		this.saveUrlsToLocalStorage();
 	}
 
 	loadSavedUrls() {
