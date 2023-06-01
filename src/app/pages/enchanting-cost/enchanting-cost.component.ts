@@ -22,6 +22,13 @@ export class EnchantingCostComponent {
 	savedUrls: { name: string; url: string; type: EnchantingType; id: number }[] = [];
 	showSavedUrls: boolean = false;
 
+	public typeImages = {
+		phys: '../../assets/phys_weapon.png',
+		mag: '../../assets/magic_weapon.png',
+		armor: '../../assets/armor.png',
+		'full-body': '../../assets/full_body.png',
+	};
+
 	constructor(
 		private _calculator: EnchantCostCalculator,
 		private _notificationService: NotificationService,

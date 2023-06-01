@@ -6,7 +6,7 @@
             <input id="physical-weapon" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="phys" (ngModelChange)="typeChanged($event)">
             <div class="radio-tile">
               <div class="icon">
-                <img src="../../assets/phys_weapon.png" alt="Physical Weapon">
+                <img [src]="typeImages['phys']" alt="Physical Weapon">
               </div>
               <label for="physical-weapon" class="radio-tile-label">Physical weapon</label>
             </div>
@@ -16,7 +16,7 @@
             <input id="magic-weapon" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="mag" (ngModelChange)="typeChanged($event)">
             <div class="radio-tile">
               <div class="icon">
-                <img src="../../assets/magic_weapon.png" alt="Magic Weapon">
+                <img [src]="typeImages['mag']" alt="Magic Weapon">
               </div>
               <label for="magic-weapon" class="radio-tile-label">Magic weapon</label>
             </div>
@@ -26,7 +26,7 @@
             <input id="armor" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="armor" (ngModelChange)="typeChanged($event)">
             <div class="radio-tile">
               <div class="icon">
-                <img src="../../assets/armor.png" alt="Armor/Jewel pieces">
+                <img [src]="typeImages['armor']" alt="Armor/Jewel pieces">
               </div>
               <label for="armor" class="radio-tile-label">Armor/Jewel pieces</label>
             </div>
@@ -36,7 +36,7 @@
             <input id="full-body" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="full-body" (ngModelChange)="typeChanged($event)">
             <div class="radio-tile">
               <div class="icon">
-                <img src="../../assets/full_body.png" alt="Full body">
+                <img [src]="typeImages['full-body']" alt="Full body">
               </div>
               <label for="full-body" class="radio-tile-label">Full body</label>
             </div>
@@ -106,7 +106,7 @@
           </button>
           <a [href]="savedUrl.url" [title]="savedUrl.name">
             <button class="saved-url-button">
-              <img src="../../assets/phys_weapon.png">
+              <img [src]="typeImages[savedUrl.type]">
               <label>{{savedUrl.name}}</label>
             </button>
           </a>
