@@ -6,6 +6,44 @@
   
   $primary-color: #079ad9;
 
+  .menu-bar {
+    display: none;
+  }
+
+  .menu-visible {
+    display: block;
+  }
+
+  .menu-invisible {
+    display: none;
+  }
+
+  .menu {
+    height: 94%;
+    position: fixed;
+    width: 100%;
+    top: 50px;
+    background-color: #11233A;
+    z-index: 99;
+
+    .mobile-buttons {
+      display: flex;
+      margin: 0 4px;
+
+      .saved-urls {
+        margin-top: 0;
+        display: flex;
+        flex-direction: row;
+        flex-flow: wrap;
+      }
+    }
+  }
+
+  .header-title {
+    width: 100%;
+    text-align: center;
+  }
+
   .section-container {
     display: flex;
     flex-direction: column;
@@ -214,3 +252,59 @@
       }
     }
   }
+
+  .mobile-menu {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+
+    i {
+      font-size: 27px;
+      margin: 5px;
+    }
+  }
+
+  @media (min-width: 701px) {
+    .menu {
+      display: none;
+    }
+  }
+   @media  (max-width: 700px) {
+    
+    .mobile-menu {
+      position: fixed;
+      background-color: #11233A;
+      z-index: 9999;
+      height: 50px;
+    }
+    .menu-bar {
+      display: block;
+      cursor: pointer;
+    }
+
+     .text-container {
+       flex-direction: column;
+
+       input { width: 240px; }
+     }
+
+     .buttons-container {
+      display: none;
+     }
+
+     .price-table {
+      td, th {
+        width: 120px;
+      }
+     }
+
+     .radio-tile-group .input-container {
+      height:  7rem;
+      width:  7rem;
+     }
+
+     .container {
+        margin-top: 47px;
+     }
+   }

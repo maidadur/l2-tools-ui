@@ -21,6 +21,7 @@ export class EnchantingCostComponent {
 	public unitCaption = 'Million';
 	savedUrls: { name: string; url: string; type: EnchantingType; id: number }[] = [];
 	showSavedUrls: boolean = false;
+	showMenu = false;
 
 	public typeImages = {
 		phys: '../../assets/phys_weapon.png',
@@ -122,5 +123,9 @@ export class EnchantingCostComponent {
 		navigator.clipboard.writeText(url).then(() => {
 			this._notificationService.showSuccess('URL copied to clipboard');
 		});
+	}
+
+	public onMenuClick() {
+		this.showMenu = !this.showMenu;
 	}
 }

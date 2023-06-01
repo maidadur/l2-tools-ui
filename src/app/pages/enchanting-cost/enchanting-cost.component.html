@@ -1,5 +1,36 @@
 <div class="section-container">
-    <h2>Enchanted items cost</h2>
+    <div class="mobile-menu">
+      <i class="menu-bar fa-solid fa-bars" (click)="onMenuClick()"></i>
+      <div class="header-title">
+        <h2>Enchanted items cost</h2>
+      </div>
+    </div>
+    <div class="menu" [ngClass]="showMenu ? 'menu-visible' : 'menu-invisible'">
+      <div class="mobile-buttons">
+        <div>
+          <button class="save-button" (click)="onSaveClick()" title="Save">
+            <i class="fa fa-save"></i>
+          </button>
+          <button class="share-button" (click)="onShareClick()" title="Share">
+            <i class="fa fa-share"></i>
+          </button>
+        </div>
+
+        <div class="saved-urls" *ngIf="showSavedUrls">
+          <div class="saved-url" *ngFor="let savedUrl of savedUrls">
+            <button class="delete-saved-url-button" (click)="onSavedUrlDelete(savedUrl.id)">
+              <i class="fa fa-close"></i>
+            </button>
+            <a [href]="savedUrl.url" [title]="savedUrl.name">
+              <button class="saved-url-button">
+                <img [src]="typeImages[savedUrl.type]">
+                <label>{{savedUrl.name}}</label>
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="container">
         <div class="radio-tile-group">
           <div class="input-container">
@@ -57,7 +88,7 @@
               <input  type="number" [(ngModel)]="enchantScrollPriceValue" placeholder="Enter enchant scroll price" min="0" (input)="recalculatePrices()">
             </div>
         </div>
-        <div class="input-container">
+        <!-- <div class="input-container">
           <div class="slider-label-container">
             <label id="slider-name-label" >Units: </label>
             <label class="slider-value-label">{{unitCaption}}</label>
@@ -68,7 +99,7 @@
               [step]="1">
             <input matSliderThumb [(ngModel)]="unit" (input)="onSliderChanged()">
           </mat-slider>
-        </div>
+        </div> -->
       </div>
   </div>
   <div class="table-container">
