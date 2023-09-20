@@ -1,0 +1,61 @@
+<div class="section-container">
+    <div class="container">
+        <div class="table-container">
+            <table class="experience-table">
+              <thead>
+                <tr>
+                  <th>Level</th>
+                  <th>Diff</th>
+                  <th>Total exp.</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let entity of entities; let i = index">
+                  <td>{{ entity.level }}</td>
+                  <td>{{ +entity.expCount - +(entities[i - 1] && entities[i - 1].expCount) || 0 | number }}</td>
+                  <td>{{ entity.expCount | number }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="controls-container">
+            <div class="header-title">
+              <h2>Exp farming cost</h2>
+            </div>
+            <div class="text-container">
+              <div class="input-container">
+                  <label>Current level</label>
+                  <div>
+                    <input type="number" placeholder="Example: 75.12" [(ngModel)]="currentLevel" min="1" max="81" (input)="recalculatePrices()">
+                  </div>
+              </div>
+              <div class="input-container">
+                <label>Target level</label>
+                <div>
+                  <input  type="number" placeholder="Example: 76.00" [(ngModel)]="targetLevel" min="1" max="81" (input)="recalculatePrices()">
+                </div>
+              </div>
+            </div>
+            <div class="input-container">
+              <label>Exp. diff</label>
+              <div>
+                <input type="text" readonly [value]="diffExp | number">
+              </div>
+          </div>
+            <div class="text-container">
+              <div class="input-container">
+                  <label>1kk exp price</label>
+                  <div>
+                    <input type="number" placeholder="1.00" [(ngModel)]="expPrice" min="0" (input)="recalculatePrices()">
+                  </div>
+              </div>
+              <div class="input-container">
+                  <label>Total price</label>
+                  <div>
+                    <input type="text" readonly [value]="totalPrice | number">
+                  </div>
+              </div>
+            </div>
+          </div>
+    </div>
+</div>

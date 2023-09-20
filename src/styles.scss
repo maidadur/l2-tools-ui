@@ -65,3 +65,51 @@ tbody tr:hover {
 button {
   cursor: pointer;
 }
+
+
+.section-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table-container {
+  display: flex;
+  justify-content: center;
+}
+
+table {
+  text-align: center;
+
+  th, td {
+    width: 250px;
+  }
+  
+}
+
+.text-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.input-container {
+  margin: 0 10px;
+}
+
+label {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+input {
+  width: 166px;
+  padding: 8px;
+  font-size: 14px;
+}

@@ -12,9 +12,11 @@ import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
 import { HomeComponent } from './pages/home/home.component';
+import { ExperienceComponent } from './pages/experience/experience.component';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @NgModule({
-	declarations: [AppComponent, HomeComponent, EnchantingCostComponent],
+	declarations: [AppComponent, HomeComponent, EnchantingCostComponent, ExperienceComponent],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
@@ -25,6 +27,7 @@ import { HomeComponent } from './pages/home/home.component';
 		CommonModule,
 		MatSliderModule,
 		MatSnackBarModule,
+		HttpClientModule,
 	],
 	providers: [],
 	bootstrap: [AppComponent],

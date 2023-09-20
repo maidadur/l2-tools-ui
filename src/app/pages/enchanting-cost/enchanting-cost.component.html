@@ -79,13 +79,13 @@
         <div class="input-container">
             <label>Item Price</label>
             <div>
-              <input  type="number" [(ngModel)]="itemPriceValue" placeholder="Enter item price" min="0" (input)="recalculatePrices()">
+              <input  type="number" placeholder="Enter item price" [(ngModel)]="itemPriceValue" min="0" (input)="recalculatePrices()">
             </div>
         </div>
         <div class="input-container">
             <label>Enchant Scroll Price</label>
             <div>
-              <input  type="number" [(ngModel)]="enchantScrollPriceValue" placeholder="Enter enchant scroll price" min="0" (input)="recalculatePrices()">
+              <input  type="number" placeholder="Enter enchant scroll price" [(ngModel)]="enchantScrollPriceValue" min="0" (input)="recalculatePrices()">
             </div>
         </div>
         <!-- <div class="input-container">
@@ -103,20 +103,20 @@
       </div>
   </div>
   <div class="table-container">
-  <table class="price-table">
-    <thead>
-      <tr>
-        <th>Enchant Level</th>
-        <th>Price ({{unitCaption}})</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let price of prices; let i = index">
-        <td>+{{ i + 1 }}</td>
-        <td>{{ price | number }}</td>
-      </tr>
-    </tbody>
-  </table>
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>Enchant Level</th>
+          <th>Price ({{unitCaption}})</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let price of prices; let i = index">
+          <td>+{{ i + 1 }}</td>
+          <td>{{ price | number }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
     <!-- Rest of your content -->
   
