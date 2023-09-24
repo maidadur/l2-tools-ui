@@ -1,0 +1,46 @@
+.fileImportContainer {
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+    width: 100%;
+
+    label {
+        margin-bottom: 0px;
+    }
+
+    .inputfile {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+
+    .file-info-container {
+        display: flex;
+        padding-left: 16px;
+        flex: 1;
+        min-width: 0;
+
+        .flex-alignment {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+
+            .material-icons {
+                max-width: 24px;
+            }
+
+            .file-info {
+                font-size: 14px;
+                line-height: 16px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+                flex: 1;
+            }
+        }
+    }
+}

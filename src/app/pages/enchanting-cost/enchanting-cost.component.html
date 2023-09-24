@@ -1,91 +1,96 @@
 <div class="section-container">
     <div class="mobile-menu">
-      <i class="menu-bar fa-solid fa-bars" (click)="onMenuClick()"></i>
-      <div class="header-title">
-        <h2>Enchanted items cost</h2>
-      </div>
+        <i class="menu-bar fa-solid fa-bars" (click)="onMenuClick()"></i>
+        <div class="header-title">
+            <h2>Enchanted items cost</h2>
+        </div>
     </div>
     <div class="menu" [ngClass]="showMenu ? 'menu-visible' : 'menu-invisible'">
-      <div class="mobile-buttons">
-        <div>
-          <button class="save-button" (click)="onSaveClick()" title="Save">
-            <i class="fa fa-save"></i>
-          </button>
-          <button class="share-button" (click)="onShareClick()" title="Share">
-            <i class="fa fa-share"></i>
-          </button>
-        </div>
+        <div class="mobile-buttons">
+            <div>
+                <button class="save-button" (click)="onSaveClick()" title="Save">
+                    <i class="fa fa-save"></i>
+                </button>
+                <button class="share-button" (click)="onShareClick()" title="Share">
+                    <i class="fa fa-share"></i>
+                </button>
+            </div>
 
-        <div class="saved-urls" *ngIf="showSavedUrls">
-          <div class="saved-url" *ngFor="let savedUrl of savedUrls">
-            <button class="delete-saved-url-button" (click)="onSavedUrlDelete(savedUrl.id)">
-              <i class="fa fa-close"></i>
-            </button>
-            <a [href]="savedUrl.url" [title]="savedUrl.name">
-              <button class="saved-url-button">
-                <img [src]="typeImages[savedUrl.type]">
-                <label>{{savedUrl.name}}</label>
-              </button>
-            </a>
-          </div>
+            <div class="saved-urls" *ngIf="showSavedUrls">
+                <div class="saved-url" *ngFor="let savedUrl of savedUrls">
+                    <button class="delete-saved-url-button" (click)="onSavedUrlDelete(savedUrl.id)">
+                        <i class="fa fa-close"></i>
+                    </button>
+                    <a [href]="savedUrl.url" [title]="savedUrl.name">
+                        <button class="saved-url-button">
+                            <img [src]="typeImages[savedUrl.type]">
+                            <label>{{savedUrl.name}}</label>
+                        </button>
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
     <div class="container">
         <div class="radio-tile-group">
-          <div class="input-container">
-            <input id="physical-weapon" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="phys" (ngModelChange)="typeChanged($event)">
-            <div class="radio-tile">
-              <div class="icon">
-                <img [src]="typeImages['phys']" alt="Physical Weapon">
-              </div>
-              <label for="physical-weapon" class="radio-tile-label">Physical weapon</label>
+            <div class="input-container">
+                <input id="physical-weapon" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="phys"
+                    (ngModelChange)="typeChanged($event)">
+                <div class="radio-tile">
+                    <div class="icon">
+                        <img [src]="typeImages['phys']" alt="Physical Weapon">
+                    </div>
+                    <label for="physical-weapon" class="radio-tile-label">Physical weapon</label>
+                </div>
             </div>
-          </div>
-      
-          <div class="input-container">
-            <input id="magic-weapon" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="mag" (ngModelChange)="typeChanged($event)">
-            <div class="radio-tile">
-              <div class="icon">
-                <img [src]="typeImages['mag']" alt="Magic Weapon">
-              </div>
-              <label for="magic-weapon" class="radio-tile-label">Magic weapon</label>
+
+            <div class="input-container">
+                <input id="magic-weapon" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="mag"
+                    (ngModelChange)="typeChanged($event)">
+                <div class="radio-tile">
+                    <div class="icon">
+                        <img [src]="typeImages['mag']" alt="Magic Weapon">
+                    </div>
+                    <label for="magic-weapon" class="radio-tile-label">Magic weapon</label>
+                </div>
             </div>
-          </div>
-      
-          <div class="input-container">
-            <input id="armor" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="armor" (ngModelChange)="typeChanged($event)">
-            <div class="radio-tile">
-              <div class="icon">
-                <img [src]="typeImages['armor']" alt="Armor/Jewel pieces">
-              </div>
-              <label for="armor" class="radio-tile-label">Armor/Jewel pieces</label>
+
+            <div class="input-container">
+                <input id="armor" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="armor"
+                    (ngModelChange)="typeChanged($event)">
+                <div class="radio-tile">
+                    <div class="icon">
+                        <img [src]="typeImages['armor']" alt="Armor/Jewel pieces">
+                    </div>
+                    <label for="armor" class="radio-tile-label">Armor/Jewel pieces</label>
+                </div>
             </div>
-          </div>
-      
-          <div class="input-container">
-            <input id="full-body" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="full-body" (ngModelChange)="typeChanged($event)">
-            <div class="radio-tile">
-              <div class="icon">
-                <img [src]="typeImages['full-body']" alt="Full body">
-              </div>
-              <label for="full-body" class="radio-tile-label">Full body</label>
+
+            <div class="input-container">
+                <input id="full-body" class="radio-button" type="radio" name="radio" [(ngModel)]="enchantType" value="full-body"
+                    (ngModelChange)="typeChanged($event)">
+                <div class="radio-tile">
+                    <div class="icon">
+                        <img [src]="typeImages['full-body']" alt="Full body">
+                    </div>
+                    <label for="full-body" class="radio-tile-label">Full body</label>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-      
+    </div>
+
     <div class="text-container">
         <div class="input-container">
             <label>Item Price</label>
             <div>
-              <input  type="number" placeholder="Enter item price" [(ngModel)]="itemPriceValue" min="0" (input)="recalculatePrices()">
+                <input type="number" placeholder="Enter item price" [(ngModel)]="itemPriceValue" min="0" (input)="recalculatePrices()">
             </div>
         </div>
         <div class="input-container">
             <label>Enchant Scroll Price</label>
             <div>
-              <input  type="number" placeholder="Enter enchant scroll price" [(ngModel)]="enchantScrollPriceValue" min="0" (input)="recalculatePrices()">
+                <input type="number" placeholder="Enter enchant scroll price" [(ngModel)]="enchantScrollPriceValue" min="0"
+                    (input)="recalculatePrices()">
             </div>
         </div>
         <!-- <div class="input-container">
@@ -100,49 +105,47 @@
             <input matSliderThumb [(ngModel)]="unit" (input)="onSliderChanged()">
           </mat-slider>
         </div> -->
-      </div>
-  </div>
-  <div class="table-container">
-    <table class="price-table">
-      <thead>
-        <tr>
-          <th>Enchant Level</th>
-          <th>Price ({{unitCaption}})</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let price of prices; let i = index">
-          <td>+{{ i + 1 }}</td>
-          <td>{{ price | number }}</td>
-        </tr>
-      </tbody>
+    </div>
+</div>
+<div class="table-container">
+    <table class="price-table fixed-width">
+        <thead>
+            <tr>
+                <th>Enchant Level</th>
+                <th>Price ({{unitCaption}})</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let price of prices; let i = index">
+                <td>+{{ i + 1 }}</td>
+                <td>{{ price | number }}</td>
+            </tr>
+        </tbody>
     </table>
-  </div>
-    <!-- Rest of your content -->
-  
-    <div class="buttons-container">
-      <div>
+</div>
+<!-- Rest of your content -->
+
+<div class="buttons-container">
+    <div>
         <button class="save-button" (click)="onSaveClick()" title="Save">
-          <i class="fa fa-save"></i>
+            <i class="fa fa-save"></i>
         </button>
         <button class="share-button" (click)="onShareClick()" title="Share">
-          <i class="fa fa-share"></i>
+            <i class="fa fa-share"></i>
         </button>
-      </div>
-
-      <div class="saved-urls" *ngIf="showSavedUrls">
-        <div class="saved-url" *ngFor="let savedUrl of savedUrls">
-          <button class="delete-saved-url-button" (click)="onSavedUrlDelete(savedUrl.id)">
-            <i class="fa fa-close"></i>
-          </button>
-          <a [href]="savedUrl.url" [title]="savedUrl.name">
-            <button class="saved-url-button">
-              <img [src]="typeImages[savedUrl.type]">
-              <label>{{savedUrl.name}}</label>
-            </button>
-          </a>
-        </div>
-      </div>
     </div>
 
-    
+    <div class="saved-urls" *ngIf="showSavedUrls">
+        <div class="saved-url" *ngFor="let savedUrl of savedUrls">
+            <button class="delete-saved-url-button" (click)="onSavedUrlDelete(savedUrl.id)">
+                <i class="fa fa-close"></i>
+            </button>
+            <a [href]="savedUrl.url" [title]="savedUrl.name">
+                <button class="saved-url-button">
+                    <img [src]="typeImages[savedUrl.type]">
+                    <label>{{savedUrl.name}}</label>
+                </button>
+            </a>
+        </div>
+    </div>
+</div>

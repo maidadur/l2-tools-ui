@@ -1,0 +1,43 @@
+<div class="section-container">
+    <div class="toolbar">
+        <app-file-import (onFileSelected)="onSelectedFile($event)"></app-file-import>
+    </div>
+
+    <div *ngIf="isProcessing">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <ng-container *ngIf="!isProcessing">
+        <div class="container" *ngIf="selectedFileEditOption">
+            <div class="textarea-container" *ngIf="selectedFileEditOption?.type=='raw'">
+                <textarea matInput style="resize: none;" [(ngModel)]="rawContent"></textarea>
+            </div>
+        </div>
+
+        <div class="container" *ngIf="selectedFileEditOption?.type=='table'">
+            <div class="table-container" *ngVar="getFilteredFields() as fields">
+                <table class="experience-table">
+                    <thead>
+                        <tr>
+                            <th *ngFor="let field of fields">{{field.name}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let row of table.rows">
+                            <td *ngFor="let field of fields">
+                                <span *ngIf="!field.isEditable">
+                                    {{row[field.internalName+"Mapped"]?row[field.internalName+"Mapped"]:row[field.internalName]}}
+                                </span>
+                                <ng-container *ngIf="field.isEditable">
+                                    <input *ngIf="field.type=='string'" matInput [(ngModel)]="row[field.internalName]" />
+                                    <span *ngIf="field.type=='color'"
+                                        [ngStyle]="{'color': '#'+row[field.internalName]}">#{{row[field.internalName]}}</span>
+                                </ng-container>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </ng-container>
+</div>

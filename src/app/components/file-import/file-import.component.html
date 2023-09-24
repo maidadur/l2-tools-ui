@@ -1,0 +1,13 @@
+<div class="fileImportContainer">
+    <input (change)="fetchFileInfo()" class="inputfile" type="file" [name]="'fileinput' + inputId" [attr.id]="inputId" [accept]="accept"
+        #fileInput>
+    <label [attr.for]="inputId" (click)="open()" [ngClass]="{'active': fileIsSelected}">
+        <button mat-raised-button color="primary">{{importButtonText}}</button>
+    </label>
+    <div class="file-info-container" *ngIf="fileIsSelected">
+        <div class="flex-alignment">
+            <i class="material-icons">insert_drive_file</i>
+            <span class="file-info"> {{ fileName }}</span>
+        </div>
+    </div>
+</div>
