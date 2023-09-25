@@ -29,4 +29,13 @@ export class ArrayUtility {
         }
         return uintArray;
     }
+
+    toBinaryStringArray(array: Uint8Array): string {
+        let str = '';
+
+        for (let i = 0; i < array.length; i++) {
+            str += String.fromCharCode(array[i]);
+        }
+        return str;
+    }
 }

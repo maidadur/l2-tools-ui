@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { gzip, ungzip } from "pako";
+import { deflate, inflate } from "pako";
 import { ArrayUtility } from "../utilities/array.utility";
 import { ConvertUtility } from "../utilities/convert.utility";
 import { MathUtility } from "../utilities/math.utility";
@@ -8,42 +8,68 @@ import { MathUtility } from "../utilities/math.utility";
     providedIn: 'root',
 })
 export class RSACryptoService {
-    private _textEncoder = new TextEncoder();
+    private _decoder = new TextDecoder();
+    private _encoder = new TextEncoder();
 
     constructor(private _mathUtility: MathUtility,
         private _convertUtility: ConvertUtility,
         private _arrayUtility: ArrayUtility) { }
 
-    encrypt(content: string, n: bigint, e: bigint, header: string): Promise<Uint8Array> {
-        return new Promise(resolve => {
-            const rawBytes = this._textEncoder.encode(content);
-            const contentBytes = gzip(rawBytes);
-            const contentList = new Uint8Array(contentBytes.length + 4);
-            contentList.set(new Uint8Array(contentBytes), 4);
+    uIntToBytes(uint: number): Uint8Array {
+        const bytes = new Uint8Array(4);
+        for (let index = 0; index < bytes.length; index++) {
+            var byte = uint & 0xff;
+            bytes[index] = byte;
+            uint = (uint - byte) / 256;
+        }
+        return bytes;
+    }
 
+    encrypt(rawBytes: Uint8Array, n: bigint, e: bigint, header: string): Promise<Uint8Array> {
+        return new Promise(resolve => {
+            const content = this._decoder.decode(rawBytes);
+            const compressedBytes = deflate(content);
+            const contentList = new Uint8Array(compressedBytes.length + 4);
+            contentList.set(this.uIntToBytes(content.length), 0);
+            contentList.set(new Uint8Array(compressedBytes), 4);
             const list = [];
 
             let size = 124;
             let commonSize = 0;
-            while (contentBytes.length > commonSize) {
+            while (contentList.length > commonSize) {
                 const blockBytes = new Uint8Array(size + 1);
                 blockBytes[0] = size;
-                blockBytes.set(contentBytes.subarray(commonSize, commonSize + size), 1);
+                blockBytes.set(contentList.subarray(commonSize, commonSize + size), 1);
 
                 const blockInt = this._convertUtility.bytesToBigInt(blockBytes);
                 const powedVal = this._mathUtility.powermod(blockInt, e, n);
-
-                const hex = powedVal.toString(16);
+                let hex = powedVal.toString(16);
+                while (hex.length != 256) {
+                    hex = "0" + hex;
+                }
                 const powerValBytes = this._convertUtility.hexStringToBytes(hex);
                 list.push(powerValBytes);
                 commonSize += size;
-                size = Math.min(contentBytes.length - commonSize, 124);
+                size = Math.min(contentList.length - commonSize, 124);
             }
 
-            const headerBytes = this._textEncoder.encode(header);
+            const headerBytes = Buffer.from(header, "utf16le");
             list.unshift(headerBytes);
 
-            resolve(this._arrayUtility.mergeUintArrays(list));
+            // const buffer = new ArrayBuffer(20);
+            // const view = new DataView(buffer);
+
+            // const crc32Value = this.calculateChecksum(this._arrayUtility.mergeUintArrays(list));
+            // view.setUint32(0, 0, true);
+            // view.setUint32(4, 0, true);
+            // view.setUint32(8, 0, true);
+            // view.setUint32(12, crc32Value, true);
+            // view.setUint32(16, 0, true);
+
+            // list.push(new Uint8Array(buffer, 0, 20));
+            const encryptedBytes = this._arrayUtility.mergeUintArrays(list);
+
+            resolve(encryptedBytes);
         });
     }
 
@@ -83,10 +109,32 @@ export class RSACryptoService {
                 list.push(resultArray);
             }
             const result = this._arrayUtility.mergeUintArrays(list).slice(4);
-
-            const uncompressedData = ungzip(result);
+            const uncompressedData = inflate(result);
 
             resolve(uncompressedData);
         });
+    }
+
+    calculateChecksum(bytes: Uint8Array): number {
+        const divisor = 0xEDB88320;
+        let crc = 0xFFFFFFFF;
+        for (const byte of bytes) {
+            crc = (crc ^ byte);
+            for (let i = 0; i < 8; i++) {
+                if (crc & 1) {
+                    crc = (crc >>> 1) ^ divisor;
+                } else {
+                    crc = crc >>> 1;
+                }
+            }
+        }
+        return this.toUnsignedInt32(crc ^ 0xFFFFFFFF);
+    };
+
+    toUnsignedInt32(n: number): number {
+        if (n >= 0) {
+            return n;
+        }
+        return 0xFFFFFFFF - (n * -1) + 1;
     }
 }

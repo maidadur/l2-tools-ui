@@ -8,10 +8,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { TextFieldModule } from "@angular/cdk/text-field";
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from "@angular/material/button";
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ColorPickerModule } from "ngx-color-picker";
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FileImportComponent } from './components/file-import/file-import.component';
@@ -36,6 +37,7 @@ import { HomeComponent } from './pages/home/home.component';
         AppRoutingModule,
         TextFieldModule,
         FormsModule,
+        ReactiveFormsModule,
         BrowserAnimationsModule,
         MatInputModule,
         MatButtonModule,
@@ -44,7 +46,8 @@ import { HomeComponent } from './pages/home/home.component';
         MatSliderModule,
         MatSnackBarModule,
         HttpClientModule,
-        MatProgressSpinnerModule
+        MatProgressSpinnerModule,
+        ColorPickerModule
     ],
     providers: [],
     bootstrap: [AppComponent],

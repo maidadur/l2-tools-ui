@@ -1,6 +1,9 @@
 <div class="section-container">
     <div class="toolbar">
         <app-file-import (onFileSelected)="onSelectedFile($event)"></app-file-import>
+        <div *ngIf="selectedFileEditOption">
+            <button mat-raised-button (click)="saveFile()" color="primary">Save file</button>
+        </div>
     </div>
 
     <div *ngIf="isProcessing">
@@ -19,7 +22,7 @@
                 <table class="experience-table">
                     <thead>
                         <tr>
-                            <th *ngFor="let field of fields">{{field.name}}</th>
+                            <th *ngFor="let field of fields" [ngStyle]="{width:getWidth(field)}">{{field.name}}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -30,8 +33,13 @@
                                 </span>
                                 <ng-container *ngIf="field.isEditable">
                                     <input *ngIf="field.type=='string'" matInput [(ngModel)]="row[field.internalName]" />
-                                    <span *ngIf="field.type=='color'"
-                                        [ngStyle]="{'color': '#'+row[field.internalName]}">#{{row[field.internalName]}}</span>
+                                    <span *ngIf="field.type=='color'" class="color-picker-container">
+                                        <span [(colorPicker)]="row[field.internalName]" [cpPositionRelativeToArrow]="true"
+                                            [cpOutputFormat]="'hex'" [style.color]="row[field.internalName]">
+                                            <span class="text">Text example (click to change)</span>
+                                        </span>
+                                    </span>
+
                                 </ng-container>
                             </td>
                         </tr>

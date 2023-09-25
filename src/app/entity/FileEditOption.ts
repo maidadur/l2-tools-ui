@@ -4,5 +4,6 @@ export interface IFileEditOption {
     fileName: string;
     type: "raw" | "table";
     fields?: IField[];
-    process: (array: Uint8Array) => void;
+    parse: (arr: Uint8Array) => void;
+    compress: () => Uint8Array;
 }

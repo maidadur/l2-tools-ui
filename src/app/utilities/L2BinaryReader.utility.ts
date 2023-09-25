@@ -2,12 +2,13 @@ export class L2BinaryReaderUtility {
     private _offset: number = 0;
     private readonly _bytes: Uint8Array;
     private readonly _utf8TextEncoder = new TextDecoder('utf-8');
+    private readonly _utf16TextEncoder = new TextDecoder('utf-16');
 
     constructor(bytes: Uint8Array) {
         this._bytes = bytes;
     }
 
-    parseUInt() {
+    parseUInt(): number {
         const intVal = new Uint8Array(4);
         for (let i = 0; i < 4; i++) {
             intVal[i] = this._bytes[this._offset + i];
@@ -17,8 +18,12 @@ export class L2BinaryReaderUtility {
     }
 
     parseByteToHex(): string {
+        return this.parseByte().toString(16).padStart(2, "0");
+    }
+
+    parseByte(): number {
         this._offset++;
-        return this._bytes[this._offset - 1].toString(16).padStart(2, "0");
+        return this._bytes[this._offset - 1];
     }
 
     parseString(): string {
@@ -41,7 +46,7 @@ export class L2BinaryReaderUtility {
             for (let i = 0; i < len * 2; i++) {
                 utf16Bytes[i] = this._bytes[start + i];
             }
-            response = this._utf8TextEncoder.decode(utf16Bytes);
+            response = this._utf16TextEncoder.decode(utf16Bytes);
         } else if (a >= 0xC0 && a <= 0xFF) {
             const n = (b - (b % 2)) / 2;
             const len = ((a & ~((b % 2 === 0) ? 0xC0 : 0x80)) + (n * 0x80));
@@ -56,7 +61,7 @@ export class L2BinaryReaderUtility {
             for (let i = 0; i < len * 2; i++) {
                 utf16Bytes[i] = this._bytes[start + i];
             }
-            response = this._utf8TextEncoder.decode(utf16Bytes);
+            response = this._utf16TextEncoder.decode(utf16Bytes);
         } else if (a < 0x40) {
             if (this._offset + 1 + a >= this._bytes.length)
                 throw new Error(`Can't read ASCF! Unexpected EOF at ${this._offset + 1}`);

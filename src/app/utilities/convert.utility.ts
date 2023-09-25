@@ -22,11 +22,10 @@ export class ConvertUtility {
     }
 
     hexStringToBytes(hex: string): Uint8Array {
-        // Remove spaces or other unwanted characters
-        const sanitizedHex = hex.replace(/ /g, "");
+        let sanitizedHex = hex.replace(/ /g, "");
 
         if (sanitizedHex.length % 2 !== 0) {
-            hex = "0" + hex;
+            sanitizedHex = "0" + sanitizedHex;
         }
 
         const byteArray = new Uint8Array(sanitizedHex.length / 2);

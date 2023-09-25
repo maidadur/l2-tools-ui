@@ -3,6 +3,10 @@
 
     .toolbar {
         margin-bottom: 24px;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
     }
 
     .container {
@@ -16,6 +20,16 @@
 
                 tr td input {
                     width: 100%
+                }
+
+                .color-picker-container {
+                    position: relative;
+                    cursor: pointer;
+                    background: url('../../../assets/l2-chat-bg.png');
+                    display: block;
+                    padding: 5px;
+                    padding-left: 12px;
+                    height: 100%;
                 }
             }
         }

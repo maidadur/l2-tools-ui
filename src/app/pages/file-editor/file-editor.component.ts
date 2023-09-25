@@ -1,10 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { FileImportComponent } from "../../components/file-import/file-import.component";
 import { RSAKeys } from "../../constants/RSA-keys";
 import { IFileEditOption } from "../../entity/FileEditOption";
 import { IField, IFileTable } from "../../entity/FileTable";
 import { IFile } from "../../entity/file";
+import { FileSaver } from "../../helpers/fileSaver";
 import { RSACryptoService } from "../../servives/rsa-crypto.service";
 import { L2BinaryReaderUtility } from "../../utilities/L2BinaryReader.utility";
+import { L2BinaryWriter } from "../../utilities/L2BinaryWriter.utility";
+import { ArrayUtility } from "../../utilities/array.utility";
 
 @Component({
     templateUrl: './file-editor.component.html',
@@ -12,6 +16,8 @@ import { L2BinaryReaderUtility } from "../../utilities/L2BinaryReader.utility";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FileEditorComponent {
+    @ViewChild(FileImportComponent) filePicker!: FileImportComponent;
+
     file!: IFile;
     rawContent = "";
     table!: IFileTable;
@@ -19,10 +25,13 @@ export class FileEditorComponent {
     fileEditOptions: IFileEditOption[] = [{
         fileName: "l2.ini",
         type: "raw",
-        process: (arr) => this.rawContent = new TextDecoder().decode(arr)
+        parse: (arr) => this.rawContent = new TextDecoder().decode(arr),
+        compress: () => new TextEncoder().encode(this.rawContent),
     }, {
         fileName: "systemmsg-e.dat",
         type: "table",
+        parse: (arr) => this._parseTable(arr),
+        compress: () => this._compressTable(),
         fields: [{
             name: "Id",
             internalName: "id",
@@ -58,11 +67,12 @@ export class FileEditorComponent {
             type: "string",
             isHidden: true
         }],
-        process: (arr) => this._parseTable(arr)
     }];
     selectedFileEditOption!: IFileEditOption;
 
     constructor(private _rsaCryptoService: RSACryptoService,
+        private _arrayUtility: ArrayUtility,
+        private _fileSaver: FileSaver,
         private _cdr: ChangeDetectorRef) { }
 
     getFilteredFields(): IField[] {
@@ -72,17 +82,59 @@ export class FileEditorComponent {
     onSelectedFile(file: IFile): void {
         this.isProcessing = true;
         setTimeout(async () => {
+            console.log("original size", (file.content as string).length);
             const decryptedContent = await this._rsaCryptoService.decrypt(file.content as string, RSAKeys.modulus, RSAKeys.privateExponent);
+            console.log("decrypted size", decryptedContent.length);
             this.selectedFileEditOption = this.fileEditOptions.filter(x => x.fileName.toLowerCase() === file.name.toLowerCase())[0];
             if (!this.selectedFileEditOption) {
                 alert("Didn't find proper parser.")
                 return;
             }
             this.file = file;
-            this.selectedFileEditOption.process(decryptedContent);
+            this.selectedFileEditOption.parse(decryptedContent);
             this.isProcessing = false;
             this._cdr.detectChanges();
         }, 200);
+    }
+
+    saveFile(): void {
+        this.isProcessing = true;
+
+        setTimeout(async () => {
+            const bytes = this.selectedFileEditOption.compress();
+            console.log("compressed size", bytes.length);
+            this.selectedFileEditOption = null as any;
+            const encryptedBytes = await this._rsaCryptoService.encrypt(bytes, RSAKeys.modulus, RSAKeys.publicExponent, "Lineage2Ver413");
+            console.log("encrypted size", encryptedBytes.length);
+            this._fileSaver.saveBytes(this.file.name, encryptedBytes);
+            this.filePicker.clear();
+            this.isProcessing = false;
+            this._cdr.detectChanges();
+        }, 200);
+    }
+
+    private _compressTable(): Uint8Array {
+        const writer = new L2BinaryWriter();
+        writer.writeUint(this.table.rows.length);
+        for (let i = 0; i < this.table.rows.length; i++) {
+            const row = this.table.rows[i];
+            for (let i = 0; i < this.table.fields.length; i++) {
+                const field = this.table.fields[i];
+                switch (field.type) {
+                    case "string":
+                        writer.writeString(row[field.internalName]);
+                        break;
+                    case "number":
+                        writer.writeUint(row[field.internalName]);
+                        break;
+                    case "color":
+                        writer.writeHex(row[field.internalName]);
+                        break;
+                }
+            }
+        }
+
+        return this._arrayUtility.mergeUintArrays(writer.getBytes());
     }
 
     private _parseTable(data: Uint8Array): void {
@@ -104,6 +156,19 @@ export class FileEditorComponent {
         this.table = table;
     }
 
+    getWidth(field: IField): string {
+        if (field.internalName === "id") {
+            return "100px";
+        }
+        if (field.internalName === "group") {
+            return "200px";
+        }
+        if (field.type === "color") {
+            return "350px";
+        }
+        return "auto"
+    }
+
     private _getValue(reader: L2BinaryReaderUtility, field: IField): any {
         switch (field.type) {
             case "number": return reader.parseUInt();
@@ -113,7 +178,7 @@ export class FileEditorComponent {
                 const g = reader.parseByteToHex();
                 const r = reader.parseByteToHex();
                 const a = reader.parseByteToHex();
-                return r + g + b + a;
+                return '#' + r + g + b;
 
             default:
                 alert("Error no value for field type " + field.type);
