@@ -126,6 +126,7 @@ export class FileEditorComponent {
                 const field = this.table.fields[i];
                 switch (field.type) {
                     case "string":
+                        console.log(row[field.internalName]);
                         writer.writeString(row[field.internalName]);
                         break;
                     case "number":
@@ -133,6 +134,7 @@ export class FileEditorComponent {
                         break;
                     case "color":
                         writer.writeHex(row[field.internalName]);
+                        writer.writeBytes([255]);
                         break;
                 }
             }
@@ -150,6 +152,9 @@ export class FileEditorComponent {
             for (let j = 0; j < table.fields.length; j++) {
                 const field = table.fields[j];
                 obj[field.internalName] = this._getValue(reader, field);
+                if (field.type === "string") {
+                    console.log(obj[field.internalName]);
+                }
                 if (field.fn) {
                     obj[field.internalName + "Mapped"] = field.fn(obj[field.internalName]);
                 }

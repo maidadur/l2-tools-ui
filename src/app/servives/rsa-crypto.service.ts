@@ -24,6 +24,8 @@ export class RSACryptoService {
 
     encrypt(content: string, n: bigint, e: bigint, header: string): Promise<Uint8Array> {
         return new Promise(resolve => {
+            console.log(`${content.length} decrypted file size`);
+
             const compressedBytes = deflate(content, { level: 6 });
             const size = 124;
             const contentList = new Uint8Array(compressedBytes.length + 4);
@@ -60,6 +62,7 @@ export class RSACryptoService {
 
             list.push(new Uint8Array(buffer, 0, 20));
             const encryptedBytes = this._arrayUtility.mergeUintArrays(list);
+            console.log(`${encryptedBytes.length} encrypted file size`);
 
             resolve(encryptedBytes);
         });
@@ -78,6 +81,7 @@ export class RSACryptoService {
 
     decrypt(fileBytes: string, n: bigint, d: bigint): Promise<Uint8Array> {
         return new Promise(resolve => {
+            console.log(`${fileBytes.length} encrypted file size`);
             const blocks = Math.floor((fileBytes.length - 28) / 128);
             const encrypted = new Uint8Array(blocks * 128);
             encrypted.set(this._arrayUtility.toUint8Array(fileBytes.substr(28, blocks * 128)));
@@ -113,6 +117,8 @@ export class RSACryptoService {
             }
             const result = this._arrayUtility.mergeUintArrays(list).slice(4);
             const uncompressedData = inflate(result);
+
+            console.log(`${uncompressedData.length} decrypted file size`);
 
             resolve(uncompressedData);
         });
