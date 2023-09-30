@@ -16,7 +16,7 @@ export class L2BinaryWriter {
         for (let c = 0; c < hex.length; c += 2) {
             bytes[c / 2] = parseInt(hex.substring(c, c + 2), 16);
         }
-        this._data.push(bytes);
+        this._data.push(bytes.reverse());
     }
 
     writeBytes(arr: number[]): void {

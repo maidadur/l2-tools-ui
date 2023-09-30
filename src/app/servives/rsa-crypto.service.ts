@@ -22,7 +22,7 @@ export class RSACryptoService {
         return bytes;
     }
 
-    encrypt(content: string, n: bigint, e: bigint, header: string): Promise<Uint8Array> {
+    encrypt(content: Uint8Array, n: bigint, e: bigint, header: string): Promise<Uint8Array> {
         return new Promise(resolve => {
             console.log(`${content.length} decrypted file size`);
 
@@ -79,12 +79,12 @@ export class RSACryptoService {
         return this._convertUtility.hexStringToBytes(hex);
     }
 
-    decrypt(fileBytes: string, n: bigint, d: bigint): Promise<Uint8Array> {
+    decrypt(binaryContent: string, n: bigint, d: bigint): Promise<Uint8Array> {
         return new Promise(resolve => {
-            console.log(`${fileBytes.length} encrypted file size`);
-            const blocks = Math.floor((fileBytes.length - 28) / 128);
+            console.log(`${binaryContent.length} encrypted file size`);
+            const blocks = Math.floor((binaryContent.length - 28) / 128);
             const encrypted = new Uint8Array(blocks * 128);
-            encrypted.set(this._arrayUtility.toUint8Array(fileBytes.substr(28, blocks * 128)));
+            encrypted.set(this._arrayUtility.toUint8Array(binaryContent.substr(28, blocks * 128)));
             const list = [];
 
             for (let i = 0; i < encrypted.length; i += 128) {

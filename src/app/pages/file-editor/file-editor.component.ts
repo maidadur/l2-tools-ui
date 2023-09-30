@@ -26,7 +26,7 @@ export class FileEditorComponent {
         fileName: "l2.ini",
         type: "raw",
         parse: (arr) => this.rawContent = this.bytesToASCIIString(arr),
-        compress: () => this.rawContent,
+        compress: () => this.asciiStringToBytes(this.rawContent),
     }, {
         fileName: "systemmsg-e.dat",
         type: "table",
@@ -109,24 +109,26 @@ export class FileEditorComponent {
         }, 200);
     }
 
-    bytesToASCIIString(bytes: Uint8Array): string {
-        var binary = '';
-        for (var i = 0; i < bytes.byteLength; i++) {
-            binary += String.fromCharCode(bytes[i]);
-        }
-        return binary;
+    asciiStringToBytes(str: string): Uint8Array {
+        return Buffer.from(str, "ascii");
     }
 
-    private _compressTable(): string {
+    bytesToASCIIString(bytes: Uint8Array): string {
+        return new TextDecoder("ascii").decode(bytes);
+    }
+
+    private _compressTable(): Uint8Array {
         const writer = new L2BinaryWriter();
         writer.writeUint(this.table.rows.length);
         for (let i = 0; i < this.table.rows.length; i++) {
             const row = this.table.rows[i];
-            for (let i = 0; i < this.table.fields.length; i++) {
-                const field = this.table.fields[i];
+            for (let j = 0; j < this.table.fields.length; j++) {
+                const field = this.table.fields[j];
                 switch (field.type) {
                     case "string":
-                        console.log(row[field.internalName]);
+                        if (row[field.internalName]) {
+                            console.log(`row:${i} value:${row[field.internalName]}`);
+                        }
                         writer.writeString(row[field.internalName]);
                         break;
                     case "number":
@@ -140,7 +142,7 @@ export class FileEditorComponent {
             }
         }
 
-        return this.bytesToASCIIString(this._arrayUtility.mergeUintArrays(writer.getBytes()));
+        return this._arrayUtility.mergeUintArrays(writer.getBytes());
     }
 
     private _parseTable(data: Uint8Array): void {
@@ -152,8 +154,8 @@ export class FileEditorComponent {
             for (let j = 0; j < table.fields.length; j++) {
                 const field = table.fields[j];
                 obj[field.internalName] = this._getValue(reader, field);
-                if (field.type === "string") {
-                    console.log(obj[field.internalName]);
+                if (field.type === "string" && obj[field.internalName]) {
+                    console.log(`row: ${i} value: ${obj[field.internalName]}`);
                 }
                 if (field.fn) {
                     obj[field.internalName + "Mapped"] = field.fn(obj[field.internalName]);
