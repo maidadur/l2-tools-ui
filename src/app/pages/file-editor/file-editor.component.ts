@@ -25,8 +25,8 @@ export class FileEditorComponent {
     fileEditOptions: IFileEditOption[] = [{
         fileName: "l2.ini",
         type: "raw",
-        parse: (arr) => this.rawContent = new TextDecoder().decode(arr),
-        compress: () => new TextEncoder().encode(this.rawContent),
+        parse: (arr) => this.rawContent = this.bytesToASCIIString(arr),
+        compress: () => this.rawContent,
     }, {
         fileName: "systemmsg-e.dat",
         type: "table",
@@ -82,9 +82,7 @@ export class FileEditorComponent {
     onSelectedFile(file: IFile): void {
         this.isProcessing = true;
         setTimeout(async () => {
-            console.log("original size", (file.content as string).length);
             const decryptedContent = await this._rsaCryptoService.decrypt(file.content as string, RSAKeys.modulus, RSAKeys.privateExponent);
-            console.log("decrypted size", decryptedContent.length);
             this.selectedFileEditOption = this.fileEditOptions.filter(x => x.fileName.toLowerCase() === file.name.toLowerCase())[0];
             if (!this.selectedFileEditOption) {
                 alert("Didn't find proper parser.")
@@ -101,11 +99,9 @@ export class FileEditorComponent {
         this.isProcessing = true;
 
         setTimeout(async () => {
-            const bytes = this.selectedFileEditOption.compress();
-            console.log("compressed size", bytes.length);
+            const content = this.selectedFileEditOption.compress();
             this.selectedFileEditOption = null as any;
-            const encryptedBytes = await this._rsaCryptoService.encrypt(bytes, RSAKeys.modulus, RSAKeys.publicExponent, "Lineage2Ver413");
-            console.log("encrypted size", encryptedBytes.length);
+            const encryptedBytes = await this._rsaCryptoService.encrypt(content, RSAKeys.modulus, RSAKeys.publicExponent, "Lineage2Ver413");
             this._fileSaver.saveBytes(this.file.name, encryptedBytes);
             this.filePicker.clear();
             this.isProcessing = false;
@@ -113,7 +109,15 @@ export class FileEditorComponent {
         }, 200);
     }
 
-    private _compressTable(): Uint8Array {
+    bytesToASCIIString(bytes: Uint8Array): string {
+        var binary = '';
+        for (var i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return binary;
+    }
+
+    private _compressTable(): string {
         const writer = new L2BinaryWriter();
         writer.writeUint(this.table.rows.length);
         for (let i = 0; i < this.table.rows.length; i++) {
@@ -134,7 +138,7 @@ export class FileEditorComponent {
             }
         }
 
-        return this._arrayUtility.mergeUintArrays(writer.getBytes());
+        return this.bytesToASCIIString(this._arrayUtility.mergeUintArrays(writer.getBytes()));
     }
 
     private _parseTable(data: Uint8Array): void {

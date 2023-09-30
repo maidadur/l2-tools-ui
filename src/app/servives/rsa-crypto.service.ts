@@ -8,9 +8,6 @@ import { MathUtility } from "../utilities/math.utility";
     providedIn: 'root',
 })
 export class RSACryptoService {
-    private _decoder = new TextDecoder();
-    private _encoder = new TextEncoder();
-
     constructor(private _mathUtility: MathUtility,
         private _convertUtility: ConvertUtility,
         private _arrayUtility: ArrayUtility) { }
@@ -25,52 +22,58 @@ export class RSACryptoService {
         return bytes;
     }
 
-    encrypt(rawBytes: Uint8Array, n: bigint, e: bigint, header: string): Promise<Uint8Array> {
+    encrypt(content: string, n: bigint, e: bigint, header: string): Promise<Uint8Array> {
         return new Promise(resolve => {
-            const content = this._decoder.decode(rawBytes);
-            const compressedBytes = deflate(content);
+            const compressedBytes = deflate(content, { level: 6 });
+            const size = 124;
             const contentList = new Uint8Array(compressedBytes.length + 4);
             contentList.set(this.uIntToBytes(content.length), 0);
             contentList.set(new Uint8Array(compressedBytes), 4);
+            const blocks = Math.floor(contentList.length / size);
             const list = [];
 
-            let size = 124;
-            let commonSize = 0;
-            while (contentList.length > commonSize) {
+            for (let i = 0; i < blocks; i++) {
                 const blockBytes = new Uint8Array(size + 1);
                 blockBytes[0] = size;
-                blockBytes.set(contentList.subarray(commonSize, commonSize + size), 1);
-
-                const blockInt = this._convertUtility.bytesToBigInt(blockBytes);
-                const powedVal = this._mathUtility.powermod(blockInt, e, n);
-                let hex = powedVal.toString(16);
-                while (hex.length != 256) {
-                    hex = "0" + hex;
-                }
-                const powerValBytes = this._convertUtility.hexStringToBytes(hex);
-                list.push(powerValBytes);
-                commonSize += size;
-                size = Math.min(contentList.length - commonSize, 124);
+                blockBytes.set(contentList.subarray(i * size, i * size + size), 1);
+                list.push(this._encrypt(blockBytes, e, n));
             }
+
+            const leftOver = contentList.length % size;
+            const blockBytes = new Uint8Array(size + 1);
+            blockBytes[0] = leftOver;
+            blockBytes.set(contentList.subarray(blocks * size, blocks * size + leftOver), size + 1 - leftOver);
+            list.push(this._encrypt(blockBytes, e, n));
 
             const headerBytes = Buffer.from(header, "utf16le");
             list.unshift(headerBytes);
 
-            // const buffer = new ArrayBuffer(20);
-            // const view = new DataView(buffer);
+            const buffer = new ArrayBuffer(20);
+            const view = new DataView(buffer);
 
-            // const crc32Value = this.calculateChecksum(this._arrayUtility.mergeUintArrays(list));
-            // view.setUint32(0, 0, true);
-            // view.setUint32(4, 0, true);
-            // view.setUint32(8, 0, true);
-            // view.setUint32(12, crc32Value, true);
-            // view.setUint32(16, 0, true);
+            const crc32Value = this.calculateChecksum(this._arrayUtility.mergeUintArrays(list));
+            view.setUint32(0, 0, true);
+            view.setUint32(4, 0, true);
+            view.setUint32(8, 0, true);
+            view.setUint32(12, crc32Value, true);
+            view.setUint32(16, 0, true);
 
-            // list.push(new Uint8Array(buffer, 0, 20));
+            list.push(new Uint8Array(buffer, 0, 20));
             const encryptedBytes = this._arrayUtility.mergeUintArrays(list);
 
             resolve(encryptedBytes);
         });
+    }
+
+
+    private _encrypt(blockBytes: Uint8Array, e: bigint, n: bigint): Uint8Array {
+        const blockInt = this._convertUtility.bytesToBigInt(blockBytes);
+        const powedVal = this._mathUtility.powermod(blockInt, e, n);
+        let hex = powedVal.toString(16);
+        while (hex.length != 256) {
+            hex = "0" + hex;
+        }
+        return this._convertUtility.hexStringToBytes(hex);
     }
 
     decrypt(fileBytes: string, n: bigint, d: bigint): Promise<Uint8Array> {
@@ -80,9 +83,9 @@ export class RSACryptoService {
             encrypted.set(this._arrayUtility.toUint8Array(fileBytes.substr(28, blocks * 128)));
             const list = [];
 
-            for (let i = 0; i < blocks; i++) {
+            for (let i = 0; i < encrypted.length; i += 128) {
                 const blockBytes = new Uint8Array(128);
-                blockBytes.set(encrypted.subarray(i * 128, i * 128 + 128));
+                blockBytes.set(encrypted.subarray(i, i + 128));
 
                 const blockInt = this._convertUtility.bytesToBigInt(blockBytes);
                 const powedVal = this._mathUtility.powermod(blockInt, d, n);
@@ -118,14 +121,12 @@ export class RSACryptoService {
     calculateChecksum(bytes: Uint8Array): number {
         const divisor = 0xEDB88320;
         let crc = 0xFFFFFFFF;
+        let mask = 0;
         for (const byte of bytes) {
             crc = (crc ^ byte);
             for (let i = 0; i < 8; i++) {
-                if (crc & 1) {
-                    crc = (crc >>> 1) ^ divisor;
-                } else {
-                    crc = crc >>> 1;
-                }
+                mask = -(crc & 1);
+                crc = (crc >>> 1) ^ (divisor & mask);
             }
         }
         return this.toUnsignedInt32(crc ^ 0xFFFFFFFF);
