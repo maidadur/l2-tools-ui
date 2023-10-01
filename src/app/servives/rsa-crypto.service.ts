@@ -26,11 +26,11 @@ export class RSACryptoService {
         return new Promise(resolve => {
             console.log(`${content.length} decrypted file size`);
 
-            const compressedBytes = deflate(content, { level: 6 });
+            const compressedBytes = deflate(content);
             const size = 124;
             const contentList = new Uint8Array(compressedBytes.length + 4);
             contentList.set(this.uIntToBytes(content.length), 0);
-            contentList.set(new Uint8Array(compressedBytes), 4);
+            contentList.set(compressedBytes, 4);
             const blocks = Math.floor(contentList.length / size);
             const list = [];
 
@@ -47,27 +47,36 @@ export class RSACryptoService {
             blockBytes.set(contentList.subarray(blocks * size, blocks * size + leftOver), size + 1 - leftOver);
             list.push(this._encrypt(blockBytes, e, n));
 
+            // blockBytes[0] = leftOver + 7;
+            // const contentBytes = contentList.subarray(blocks * size, blocks * size + leftOver);
+            // let offset = size - 3;
+            // blockBytes.set(contentBytes.subarray(contentBytes.length - 4, contentBytes.length), offset);
+            // offset -= 7;
+            // blockBytes.set(new Uint8Array([0, 0, 0, 255, 255, 3, 0]), offset);
+            // offset -= leftOver - 4;
+            // blockBytes.set(contentBytes.subarray(0, contentBytes.length - 4), offset);
+            // list.push(this._encrypt(blockBytes, e, n));
+
             const headerBytes = Buffer.from(header, "utf16le");
             list.unshift(headerBytes);
 
-            const buffer = new ArrayBuffer(20);
-            const view = new DataView(buffer);
+            // const buffer = new ArrayBuffer(20);
+            // const view = new DataView(buffer);
+            // const crc32Value = this.calculateChecksum(this._arrayUtility.mergeUintArrays(list));
+            // view.setUint32(0, 0, true);
+            // view.setUint32(4, 0, true);
+            // view.setUint32(8, 0, true);
+            // view.setUint32(12, crc32Value, true);
+            // view.setUint32(16, 0, true);
+            // list.push(new Uint8Array(buffer, 0, 20));
 
-            const crc32Value = this.calculateChecksum(this._arrayUtility.mergeUintArrays(list));
-            view.setUint32(0, 0, true);
-            view.setUint32(4, 0, true);
-            view.setUint32(8, 0, true);
-            view.setUint32(12, crc32Value, true);
-            view.setUint32(16, 0, true);
-
-            list.push(new Uint8Array(buffer, 0, 20));
+            list.push(new Uint8Array(20));
             const encryptedBytes = this._arrayUtility.mergeUintArrays(list);
             console.log(`${encryptedBytes.length} encrypted file size`);
 
             resolve(encryptedBytes);
         });
     }
-
 
     private _encrypt(blockBytes: Uint8Array, e: bigint, n: bigint): Uint8Array {
         const blockInt = this._convertUtility.bytesToBigInt(blockBytes);
@@ -115,7 +124,13 @@ export class RSACryptoService {
 
                 list.push(resultArray);
             }
-            const result = this._arrayUtility.mergeUintArrays(list).slice(4);
+            const mergedList = this._arrayUtility.mergeUintArrays(list);
+            const size = ((mergedList[0]) |
+                (mergedList[1] << 8) |
+                (mergedList[2] << 16) |
+                (mergedList[3] << 24));
+            console.log(`total size: ${size}`);
+            const result = mergedList.slice(4);
             const uncompressedData = inflate(result);
 
             console.log(`${uncompressedData.length} decrypted file size`);

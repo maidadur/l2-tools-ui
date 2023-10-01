@@ -1,4 +1,4 @@
-export class L2BinaryReaderUtility {
+export class L2BinaryReader {
     private _offset: number = 0;
     private readonly _bytes: Uint8Array;
     private readonly _asciiDecoder = new TextDecoder('ascii');
@@ -24,6 +24,12 @@ export class L2BinaryReaderUtility {
     parseByte(): number {
         this._offset++;
         return this._bytes[this._offset - 1];
+    }
+
+    readBytesToEnd(): Uint8Array {
+        const offset = this._offset;
+        this._offset = this._bytes.length;
+        return this._bytes.subarray(offset, this._bytes.length);
     }
 
     parseString(): string {

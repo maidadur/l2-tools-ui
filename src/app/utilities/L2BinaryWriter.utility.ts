@@ -19,7 +19,7 @@ export class L2BinaryWriter {
         this._data.push(bytes.reverse());
     }
 
-    writeBytes(arr: number[]): void {
+    writeBytes(arr: number[] | Uint8Array): void {
         this._data.push(new Uint8Array(arr));
     }
 
@@ -30,15 +30,18 @@ export class L2BinaryWriter {
         }
         const enc = this.detectEncoding(str);
         if (enc === 'ascii') {
-            this._data.push(this.encodeASCFLengthSCII(str.length + 1));
+            this._data.push(this.encodeASCFLengthASCII(str.length + 1));
         } else {
-            this._data.push(this.encodeASCFLengthUNICODE(str.length + 1));
+            this._data.push(this.encodeASCFLengthUNI(str.length + 1));
         }
         this._data.push(this.encodeStr(str, enc));
         this.eof();
+        if (enc !== 'ascii') {
+            this.eof();
+        }
     }
 
-    encodeASCFLengthSCII(len: number): Uint8Array {
+    encodeASCFLengthASCII(len: number): Uint8Array {
         let n = Math.floor(len / 0x80);
         let b = Math.floor(len / 0x40);
         if (b < 1) {
@@ -49,11 +52,11 @@ export class L2BinaryWriter {
         return new Uint8Array([a, b]);
     }
 
-    encodeASCFLengthUNICODE(len: number): Uint8Array {
+    encodeASCFLengthUNI(len: number): Uint8Array {
         let n = Math.floor(len / 0x80);
         let b = Math.floor(len / 0x40);
         if (b < 1) {
-            return new Uint8Array(0x80 + len);
+            return new Uint8Array([0x80 + len]);
         }
         let a = (len - n * 0x80) + ((b % 2 === 0) ? 0xC0 : 0x80);
         return new Uint8Array([a, b]);

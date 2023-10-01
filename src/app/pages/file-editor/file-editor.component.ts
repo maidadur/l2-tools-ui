@@ -6,7 +6,7 @@ import { IField, IFileTable } from "../../entity/FileTable";
 import { IFile } from "../../entity/file";
 import { FileSaver } from "../../helpers/fileSaver";
 import { RSACryptoService } from "../../servives/rsa-crypto.service";
-import { L2BinaryReaderUtility } from "../../utilities/L2BinaryReader.utility";
+import { L2BinaryReader } from "../../utilities/L2BinaryReader.utility";
 import { L2BinaryWriter } from "../../utilities/L2BinaryWriter.utility";
 import { ArrayUtility } from "../../utilities/array.utility";
 
@@ -22,11 +22,12 @@ export class FileEditorComponent {
     rawContent = "";
     table!: IFileTable;
     isProcessing = false;
+    byteFooter!: Uint8Array;
     fileEditOptions: IFileEditOption[] = [{
         fileName: "l2.ini",
         type: "raw",
-        parse: (arr) => this.rawContent = this.bytesToASCIIString(arr),
-        compress: () => this.asciiStringToBytes(this.rawContent),
+        parse: (arr) => this.rawContent = this.bytesToString(arr),
+        compress: () => this.stringToBytes(this.rawContent),
     }, {
         fileName: "systemmsg-e.dat",
         type: "table",
@@ -109,12 +110,12 @@ export class FileEditorComponent {
         }, 200);
     }
 
-    asciiStringToBytes(str: string): Uint8Array {
-        return Buffer.from(str, "ascii");
+    stringToBytes(str: string): Uint8Array {
+        return Buffer.from(str.replace(/[\n]/g, "\r\n"));
     }
 
-    bytesToASCIIString(bytes: Uint8Array): string {
-        return new TextDecoder("ascii").decode(bytes);
+    bytesToString(bytes: Uint8Array): string {
+        return new TextDecoder().decode(bytes).replace(/\r\n/g, "\n");
     }
 
     private _compressTable(): Uint8Array {
@@ -126,9 +127,6 @@ export class FileEditorComponent {
                 const field = this.table.fields[j];
                 switch (field.type) {
                     case "string":
-                        if (row[field.internalName]) {
-                            console.log(`row:${i} value:${row[field.internalName]}`);
-                        }
                         writer.writeString(row[field.internalName]);
                         break;
                     case "number":
@@ -142,11 +140,13 @@ export class FileEditorComponent {
             }
         }
 
+        writer.writeBytes(this.byteFooter);
+
         return this._arrayUtility.mergeUintArrays(writer.getBytes());
     }
 
     private _parseTable(data: Uint8Array): void {
-        const reader = new L2BinaryReaderUtility(data);
+        const reader = new L2BinaryReader(data);
         const amount = reader.parseUInt();
         const table = <IFileTable>{ fields: this.selectedFileEditOption.fields, rows: [] };
         for (let i = 0; i < amount; i++) {
@@ -154,15 +154,14 @@ export class FileEditorComponent {
             for (let j = 0; j < table.fields.length; j++) {
                 const field = table.fields[j];
                 obj[field.internalName] = this._getValue(reader, field);
-                if (field.type === "string" && obj[field.internalName]) {
-                    console.log(`row: ${i} value: ${obj[field.internalName]}`);
-                }
                 if (field.fn) {
                     obj[field.internalName + "Mapped"] = field.fn(obj[field.internalName]);
                 }
             }
             table.rows.push(obj);
         }
+
+        this.byteFooter = reader.readBytesToEnd();
 
         this.table = table;
     }
@@ -180,7 +179,7 @@ export class FileEditorComponent {
         return "auto"
     }
 
-    private _getValue(reader: L2BinaryReaderUtility, field: IField): any {
+    private _getValue(reader: L2BinaryReader, field: IField): any {
         switch (field.type) {
             case "number": return reader.parseUInt();
             case "string": return reader.parseString();
