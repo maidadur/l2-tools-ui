@@ -8,6 +8,6 @@ Choose weapor/armor type, enter item price and enchant scroll price to calculate
 # Experience table
 
 Shows information on how much experience you need farm to certain lvl.
-Have calculation form on experience cost per lvl.
+Have calculation form on experience cost per lvl. 
 
 ![image](https://github.com/maidadur/l2-tools-ui/assets/6338605/69bae76f-c02e-493f-bb67-7aaadf0ab2c1)
